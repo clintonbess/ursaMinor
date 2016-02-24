@@ -1,3 +1,6 @@
+#ifndef NEWSTEP_H
+#define NEWSTEP_H
+
 class stepMotor{
 	public:
 		stepMotor();
@@ -17,3 +20,5 @@ class stepMotor{
 		int step_number;
 		int degree;
 };
+
+#endif

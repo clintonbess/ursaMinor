@@ -67,8 +67,8 @@ void stepMotor::increaseStep(int currentStep){
 
 	scan scan1;
 	int distance = scan1.getDistance();
-	// Serial.println("Here's the distance: ");
-  	// Serial.print(distance);
+	Serial.println("Here's the distance: ");
+  	Serial.print(distance);
   	// Serial.println(degree + " =  degree");
 
 }
