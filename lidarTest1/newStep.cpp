@@ -7,6 +7,7 @@ stepMotor::stepMotor(){
     read_iteration = 0;
 	direction = 0;
 	int speed = 0;
+        originalRPM = 0;
 	step_delay = 0;
 	number_of_steps = 200;
 	last_step_angle = 0;
@@ -14,7 +15,7 @@ stepMotor::stepMotor(){
 	step_number = 0;
 	degree = 0;
 
-	pinMode(output_pins[0], OUTPUT);
+    pinMode(output_pins[0], OUTPUT);
     pinMode(output_pins[1], OUTPUT);
     pinMode(output_pins[2], OUTPUT);
     pinMode(output_pins[3], OUTPUT);
@@ -22,8 +23,9 @@ stepMotor::stepMotor(){
 void stepMotor::increaseStep(int currentStep){
 
 	int angleCounter = 0;
-	int degreeInc = 0;
-    int output_pins[] = {8,9,10,11};
+	float degreeInc = 0;
+    //int output_pins[] = {8,9,10,11};
+    int output_pins[] = {A0, A1, A2, A3};
    
 
 	// currently configured for pins 8,9,10,11
@@ -57,30 +59,46 @@ void stepMotor::increaseStep(int currentStep){
 		break;
 	}
         
+        
         // reverse: decreases the angle
 	if(direction == 0)
-		degreeInc = -0.597;
+		degreeInc = -1.791;
 	else if(direction == 1)
-		degreeInc = 0.597;
+		degreeInc = 1.791;
 
 	degree += degreeInc;
-
+        int distance = 0;
 	scan scan1;
-	int distance = scan1.getDistance();
-	Serial.println("Here's the distance: ");
-  	Serial.print(distance);
+        //if(currentStep == 0){
+	//  distance = scan1.getDistance();
+        //}
+        //int distance = 0;
+	//Serial.print("Angle: ");
+        //Serial.print(degree);
+        //Serial.print(", ");
+        //Serial.print("Distance: ");
+        //Serial.println(distance);
   	// Serial.println(degree + " =  degree");
 
 }
 void stepMotor::setSpeed(int desiredSpeed){
+        originalRPM = desiredSpeed;
 	step_delay = 60L * 1000L * 1000L / number_of_steps / desiredSpeed;
 	// step_delay = 60 * 1000 * 1000;
 	// debug(step_delay);
 }
 void stepMotor::step(int steps_to_move){
+      
+        // declare scan object
+        scan scan1;
+        // Get current time
+        // Get distance from Lidar
+        //unsigned long startTime = micros();
+        //int distance = scan1.getDistance();
+        //unsigned long endTime = micros();
+        // compensate for the time it takes to read from lidar
+        //step_delay -= (endTime - startTime);
 
-	// TODO: absolute value in arduino?
-        // uncomment line below when solved
 	int steps_left = abs(steps_to_move);
 	// int steps_left = 0;
 
@@ -88,13 +106,14 @@ void stepMotor::step(int steps_to_move){
 		direction = 1;
 	}
 	else{
-		Serial.println("NEGATIVE");
 		direction = 0;
 	}
 	while(steps_left > 0){
                 
 		unsigned long current_step_time = micros();
 		if(current_step_time - last_step_time >= step_delay){
+                        // reset the speed
+                        setSpeed(originalRPM);
 			last_step_time = current_step_time;
 			if(direction == 1){
 				step_number++;
@@ -108,11 +127,34 @@ void stepMotor::step(int steps_to_move){
 					step_number = number_of_steps;
 				step_number--;
 			}
+
+                        unsigned long startTime = micros();
+                        int distance = 0;
+                        distance = scan1.getDistance();
+                        unsigned long endTime = micros();
+                        // compensate for the time it takes to read from lidar
+                        //Serial.print("Offset Calculations");
+                        //Serial.println(endTime - startTime);
+                        if( (endTime - startTime) > step_delay)
+                          step_delay = 0;
+                        else
+                          step_delay -= (endTime - startTime);
+                        //Serial.print("This is delay updated ");
+                        //Serial.println(step_delay);
+                        if(step_delay < 0)
+                          step_delay = 0;
+                        // Serial Print data
+                        Serial.print(degree);
+                        Serial.print(", ");
+                        //Serial.print("Distance: ");
+                        Serial.println(distance);
 			steps_left--;
+                        // reset step_delay
 			increaseStep(step_number % 4);
 		}
 
 	}
+        
 
 }
 void stepMotor::debug(int someValue){
