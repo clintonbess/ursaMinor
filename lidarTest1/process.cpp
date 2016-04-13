@@ -12,7 +12,7 @@ using namespace std;
 
 double roundUp(double numToRound, int multiple);
 
-int main(){
+int main(int argc, char **argv){
 
 	string line;
 	ifstream myFile ("test.txt");
@@ -55,14 +55,15 @@ int main(){
 		// close file
 		myFile.close();
 
-		int roundValue = 2;
-		int angle_offset = 12;
+		int roundValue = atoi(argv[1]);
+		int angle_offset = atoi(argv[2]);
 
+		// TODO: Average the points together so we only have one set
 		// convert polar data into cartesian coordianates
 		// and place them into their vectors
 		for(int i = 0; i < angles.size(); i++){
-			xValue.push_back ( roundUp(distances[i] * cos( (angles[i] - angle_offset) * PI / 180.0), roundValue) );
-			yValue.push_back ( roundUp (distances[i] * sin( (angles[i] - angle_offset) * PI / 180.0), roundValue) );
+			xValue.push_back ( roundUp(distances[i] * cos( (angles[i] + angle_offset) * PI / 180.0), roundValue) );
+			yValue.push_back ( roundUp (distances[i] * sin( (angles[i] + angle_offset) * PI / 180.0), roundValue) );
 		}
 		
 		// TODO: write to file

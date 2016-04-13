@@ -21,5 +21,8 @@ var quit = 0;
 // while(1){
 	console.log('starting........');
 	// var done = exec('./test_program /dev/ttyACM0 > test.txt');
+	// first argument of process is the quantize multiple
+	// second argument of process is the angle offset
+	var done = exec('./process 10 -12 > processed.txt');
 	var done = exec('python plot.py');
 // }
