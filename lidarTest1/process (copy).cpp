@@ -17,8 +17,8 @@ int main(int argc, char **argv){
 	string line;
 	ifstream myFile ("test.txt");
 
-	vector<float> angles, xValue, yValue;
-	vector<int> distances;
+	vector<float> angles, avAngles, xValue, yValue;
+	vector<int> distances, avDistances;
 
 	int temp_distance, temp_calc;
 	float temp_angle;
@@ -55,21 +55,63 @@ int main(int argc, char **argv){
 		// close file
 		myFile.close();
 
-		int roundValue = atoi(argv[1]);
-		int angle_offset = atoi(argv[2]);
+		int roundValue = 0;
+		int angle_offset = 0;
+		if(argv[1] != NULL){
+			roundValue = atoi(argv[1]);	
+
+		}		
+		if(argv[2] != NULL){
+			angle_offset = atoi(argv[2]);
+		}
 
 		// TODO: Average the points together so we only have one set
+
+		temp_distance = 0;
+		temp_angle = 0;
+		int match_counter = 0; 
+		int shit_counter = 0;
+
+		// maybe figure out a better implementation later for averaging
+		for(int i = 0; i < angles.size(); i++){
+			temp_angle = angles[i]; 
+			temp_distance = distances[i];
+			for(int j = i; i < angles.size(); j++){
+				if( (angles[j] - temp_angle) < 0.0001) {
+					match_counter++;
+					temp_distance += distances[j];
+					break;
+				}
+			}
+			// averages should only have 201 entries
+			if(shit_counter < 201){
+				avAngles.push_back(angles[i]);
+				avDistances.push_back(temp_distance/match_counter);
+				match_counter = 0;
+				shit_counter++;
+			}
+		}
+
+
+		
+
+		// cout << "Printing Averages" << endl;
+		// for(int i = 0; i < avAngles.size(); i++){
+		// 	cout << i+1 << ' ' << avAngles[i] << ' ' << avDistances[i] << endl;
+		// }
+
+
 		// convert polar data into cartesian coordianates
 		// and place them into their vectors
-		for(int i = 0; i < angles.size(); i++){
-			xValue.push_back ( roundUp(distances[i] * cos( (angles[i] + angle_offset) * PI / 180.0), roundValue) );
-			yValue.push_back ( roundUp (distances[i] * sin( (angles[i] + angle_offset) * PI / 180.0), roundValue) );
+		for(int i = 0; i < avAngles.size(); i++){
+			xValue.push_back ( roundUp(avDistances[i] * cos( (avAngles[i] + angle_offset) * PI / 180.0), roundValue) );
+			yValue.push_back ( roundUp (avDistances[i] * sin( (avAngles[i] + angle_offset) * PI / 180.0), roundValue) );
 		}
 		
 		// TODO: write to file
 		// display the cartesian coordiantes
 		for(int i = 0; i < xValue.size(); i++){
-			cout <<  xValue[i] << ", " << yValue[i] << '\n';
+			cout << xValue[i] << ", " << yValue[i] << '\n';
 		}
 	}
 	else cout << "Cannot find file" << '\n';

@@ -214,7 +214,8 @@ matplotlib.pyplot.scatter(x,y)
 # test1 = [0]
 # matplotlib.pyplot.scatter(test0, test1)
 
-signal.alarm(15)
+# closes the program after 15s
+# signal.alarm(10)
 
 matplotlib.pyplot.show()
 
